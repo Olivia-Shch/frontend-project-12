@@ -13,6 +13,9 @@ const HomePage = () => {
       <div className="jumbotron">
         <h1 className="display-4">Главная страница</h1>
         <p className="lead">Добро пожаловать на главную страницу!</p>
+        <Link to="/chat" className="btn btn-primary">
+        Перейти к чату
+        </Link>
         <hr className="my-4" />
         <p>Используйте кнопку ниже, чтобы выйти из системы.</p>
         <button onClick={handleLogout} className="btn btn-danger">
