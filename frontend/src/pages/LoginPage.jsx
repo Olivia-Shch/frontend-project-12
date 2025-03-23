@@ -1,25 +1,48 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
+// Схема валидации с использованием Yup
 const LoginSchema = Yup.object().shape({
   username: Yup.string()
     .min(3, 'Имя пользователя должно содержать минимум 3 символа')
     .required('Обязательное поле'),
   password: Yup.string()
-    .min(6, 'Пароль должен содержать минимум 6 символов')
+    .min(5, 'Пароль должен содержать минимум 5 символов')
     .required('Обязательное поле'),
 });
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
+  // Начальные значения формы
   const initialValues = {
     username: '',
     password: '',
   };
 
-  const handleSubmit = (values) => {
-    console.log('Отправленные данные:', values);
-    // Здесь будет логика отправки данных на сервер
+  // Обработчик отправки формы
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+    try {
+      // Отправка данных на сервер
+      const response = await axios.post('http://localhost:5001/api/v1/login', values);
+      console.log('Ответ сервера:', response.data); // Логируем ответ
+
+      // Сохранение токена в localStorage
+      localStorage.setItem('token', response.data.token);
+      
+      // Редирект на главную страницу
+      navigate('/');
+    } catch (error) {
+      // Логируем ошибку
+      console.error('Ошибка при авторизации:', error.response?.data || error.message);
+
+      // Обработка ошибки авторизации
+      setErrors({ username: 'Неверное имя пользователя или пароль' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -35,7 +58,7 @@ const LoginPage = () => {
             validationSchema={LoginSchema}
             onSubmit={handleSubmit}
           >
-            {() => (
+            {({ isSubmitting }) => (
               <Form>
                 {/* Поле для имени пользователя */}
                 <div className="mb-3">
@@ -46,7 +69,9 @@ const LoginPage = () => {
                     type="text"
                     name="username"
                     id="username"
-                    className="form-control"
+                    className={({ error }) =>
+                      error ? 'form-control is-invalid' : 'form-control'
+                    }
                   />
                   <ErrorMessage
                     name="username"
@@ -64,7 +89,9 @@ const LoginPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className="form-control"
+                    className={({ error }) =>
+                      error ? 'form-control is-invalid' : 'form-control'
+                    }
                   />
                   <ErrorMessage
                     name="password"
@@ -74,8 +101,8 @@ const LoginPage = () => {
                 </div>
 
                 {/* Кнопка отправки формы */}
-                <button type="submit" className="btn btn-primary">
-                  Войти
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? 'Вход...' : 'Войти'}
                 </button>
               </Form>
             )}
