@@ -9,13 +9,14 @@ import store from './store/store.js';
 import App from './App.jsx';
 import resources from './locales/index.js';
 import { addRussianDictionary } from './utils/textFilter.js';
-import { setDefaultChannel } from './store/slice/appSlice.js';
+import { io } from 'socket.io-client';
 
 const init = async (socket) => {
   const rollbarConfig = {
-    accessToken: process.env.REACT_APP_ROLLBAR_ACCESS_TOKEN,
+    accessToken: import.meta.env.VITE_ROLLBAR_ACCESS_TOKEN,
     environment: 'production',
   };
+  
 
   const i18nextInstance = i18next.createInstance();
   await i18nextInstance.init({

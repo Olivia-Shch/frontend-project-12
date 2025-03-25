@@ -12,17 +12,19 @@ import ErrorNotification from './components/ErrorNotification.jsx';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => (
-  <div className="d-flex flex-column h-100">
-    <Navbar />
-    <ErrorNotification />
-    <Routes>
-      <Route path={getPageRoute('PAGE_CHAT')} element={<PrivateRoute element={ChatPage} />} />
-      <Route path={getPageRoute('PAGE_LOGIN')} element={<Login />} />
-      <Route path={getPageRoute('PAGE_SIGNUP')} element={<Signup />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-    <ToastContainer />
-  </div>
+  <BrowserRouter> {/* Добавлен BrowserRouter */}
+    <div className="d-flex flex-column h-100">
+      <Navbar />
+      <ErrorNotification />
+      <Routes>
+        <Route path={getPageRoute('PAGE_CHAT')} element={<PrivateRoute element={ChatPage} />} />
+        <Route path={getPageRoute('PAGE_LOGIN')} element={<Login />} />
+        <Route path={getPageRoute('PAGE_SIGNUP')} element={<Signup />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      <ToastContainer />
+    </div>
+  </BrowserRouter> 
 );
 
 export default App;

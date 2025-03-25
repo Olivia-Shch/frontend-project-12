@@ -8,6 +8,26 @@ export default defineConfig({
   },
   esbuild: {
     loader: 'jsx',
-    include: /src\/.*\.(js|jsx)$/, // Apply JSX processing to .js and .jsx files
+    include: /src\/.*\.(js|jsx)$/,
   },
+   server: {
+    host: '0.0.0.0',
+    port: process.env.PORT || 5173,
+    allowedHosts: [
+      'frontend-project-12-chat-jd8m.onrender.com',
+      'localhost',
+      '.onrender.com',
+    ],
+    proxy: {
+      '/socket.io': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+        ws: true,
+      },
+      '/api': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      },
+    },
+  },   
 });
