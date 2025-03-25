@@ -5,7 +5,10 @@ import { createRoot } from 'react-dom/client';
 import init from './init.jsx';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:3000'); 
+const socket = io('/socket.io', {
+  path: '/socket.io',
+  transports: ['websocket']
+});
 
 const RootComponent = () => {
   const [app, setApp] = useState(null);

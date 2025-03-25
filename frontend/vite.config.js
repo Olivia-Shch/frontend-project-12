@@ -12,7 +12,7 @@ export default defineConfig({
   },
    server: {
     host: '0.0.0.0',
-    port: process.env.PORT || 5173,
+    port: 5002,
     allowedHosts: [
       'frontend-project-12-chat-jd8m.onrender.com',
       'localhost',
@@ -20,13 +20,14 @@ export default defineConfig({
     ],
     proxy: {
       '/socket.io': {
-        target: 'http://localhost:5001',
-        changeOrigin: true,
+        target: 'ws://localhost:5001',
         ws: true,
+        rewriteWsOrigin: true,
       },
       '/api': {
         target: 'http://localhost:5001',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },   
