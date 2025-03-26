@@ -5,5 +5,4 @@ const prepareHeaders = (headers) => {
   }
   return headers;
 };
-  
 export default prepareHeaders;

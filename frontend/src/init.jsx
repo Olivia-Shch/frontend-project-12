@@ -16,7 +16,6 @@ const init = async (socket) => {
     accessToken: import.meta.env.VITE_ROLLBAR_ACCESS_TOKEN,
     environment: 'production',
   };
-  
   const i18nextInstance = i18next.createInstance();
   await i18nextInstance.init({
     debug: false,

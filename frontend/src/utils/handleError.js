@@ -10,5 +10,4 @@ const handleError = (status, t) => {
       return t('errors.unknownError');
   }
 };
-  
 export default handleError;
