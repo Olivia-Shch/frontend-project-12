@@ -3,7 +3,7 @@ import prepareHeaders from '../utils/apiHelpers';
 import { getAuthApiRoute } from '../utils/routes';
 
 const messagesApi = createApi({
-  reducerPath: 'messages',
+  reducerPath: 'messagesApi',
   baseQuery: fetchBaseQuery({
     baseUrl: getAuthApiRoute('MESSAGES'),
     prepareHeaders: (headers) => prepareHeaders(headers),
@@ -11,27 +11,20 @@ const messagesApi = createApi({
   tagTypes: ['Messages'],
   endpoints: (builder) => ({
     getMessages: builder.query({
-      query: () => '',
+      query: () => '/messages', // Указываем корректный эндпоинт
+      providesTags: ['Messages'],
+      refetchOnMountOrArgChange: true, // Автообновление сообщений
     }),
     addMessage: builder.mutation({
       query: (message) => ({
+        url: '/messages',
         method: 'POST',
         body: message,
       }),
-    }),
-    removeMessage: builder.mutation({
-      query: (id) => ({
-        method: 'DELETE',
-        url: id,
-      }),
+      invalidatesTags: ['Messages'], // Гарантированное обновление списка сообщений
     }),
   }),
 });
 
 export default messagesApi;
-
-export const {
-  useGetMessagesQuery,
-  useAddMessageMutation,
-  useRemoveMessageMutation,
-} = messagesApi;
+export const { useGetMessagesQuery, useAddMessageMutation } = messagesApi;
