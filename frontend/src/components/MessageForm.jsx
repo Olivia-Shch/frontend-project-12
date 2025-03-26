@@ -23,20 +23,10 @@ const MessageForm = () => {
       username,
     };
 
-    try {
-      await addMessage(data).unwrap();
-      
-      if (process.env.NODE_ENV === 'test') {
-        await new Promise(resolve => setTimeout(resolve, 300));
-      }
-
-      resetForm();
-      inputRef.current.focus();
-    } catch (error) {
-      console.error('Message send error:', error);
-    } finally {
-      setSubmitting(false);
-    }
+    await addMessage(data);
+    resetForm();
+    inputRef.current.focus();
+    setSubmitting(false);
   };
 
   return (
