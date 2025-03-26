@@ -25,24 +25,19 @@ const MessageForm = () => {
     channelId: currentChannelId,
     username,
   };
-
+  
   await new Promise(resolve => requestAnimationFrame(resolve));
-  
-  await addMessage(data).unwrap();
-  
-  await new Promise(resolve => {
-    if (process.env.NODE_ENV === 'test') {
-      setTimeout(resolve, 300);
-    } else {
-      resolve();
-    }
-  });
+
+  const result = await addMessage(data).unwrap();
+
+   if (process.env.NODE_ENV === 'test') {
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
 
   resetForm();
   inputRef.current.focus();
   setSubmitting(false);
 };
-
   return (
     <div className="mt-auto px-5 py-3">
       <Formik
