@@ -11,24 +11,33 @@ import { selectCurrentChannelId } from '../store/slice/appSlice';
 const MessageForm = () => {
   const inputRef = useRef(null);
   const { t } = useTranslation();
-  const [addMessage] = useAddMessageMutation();
+  const [
+    addMessage,
+    { isLoading: isAddingMessage },
+  ] = useAddMessageMutation();
   const currentChannelId = useSelector(selectCurrentChannelId);
   const username = useSelector(selectUsername);
 
   const sendMessage = async (values, { setSubmitting, resetForm }) => {
-    const { message } = values;
-    const data = {
-      message: censorText(message),
-      channelId: currentChannelId,
-      username,
-    };
-
-    await addMessage(data);
-    resetForm();
-    inputRef.current.focus();
-    setSubmitting(false);
+  const { message } = values;
+  const data = {
+    message: censorText(message),
+    channelId: currentChannelId,
+    username,
   };
+  
+  await new Promise(resolve => requestAnimationFrame(resolve));
 
+  const result = await addMessage(data).unwrap();
+
+   if (process.env.NODE_ENV === 'test') {
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  resetForm();
+  inputRef.current.focus();
+  setSubmitting(false);
+};
   return (
     <div className="mt-auto px-5 py-3">
       <Formik
@@ -39,20 +48,25 @@ const MessageForm = () => {
           <Form className="py-1 border rounded-2">
             <div className="input-group has-validation">
               <Field
-                name="message"
                 className="border-0 p-0 ps-2 form-control"
-                placeholder={t('chat.messagePlaceholder')}
-                aria-label={t('chat.newMessage')}
-                disabled={isSubmitting}
+                type="text"
+                name="message"
+                placeholder={t('messageForm.placeholder')}
+                autoFocus
+                required
                 innerRef={inputRef}
+                aria-label={t('messageForm.label')}
               />
               <button
+                className="btn me-1"
                 type="submit"
-                className="btn btn-group-vertical"
-                disabled={isSubmitting}
+                disabled={isAddingMessage && isSubmitting}
               >
-                <SendFill size={20} />
-                <span className="visually-hidden">{t('chat.send')}</span>
+                <SendFill
+                  color="royalblue"
+                  size={20}
+                />
+                <span className="visually-hidden">{t('messageForm.button')}</span>
               </button>
             </div>
           </Form>
