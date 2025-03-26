@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { SendFill } from 'react-bootstrap-icons';
-import { useAddMessageMutation } from '../api/messagesApi';
+import { useAddMessageMutation, useGetMessagesQuery } from '../api/messagesApi';
 import { censorText } from '../utils/textFilter';
 import { selectUsername } from '../store/slice/authSlice';
 import { selectCurrentChannelId } from '../store/slice/appSlice';
@@ -11,36 +11,42 @@ import { selectCurrentChannelId } from '../store/slice/appSlice';
 const MessageForm = () => {
   const inputRef = useRef(null);
   const { t } = useTranslation();
-  const [
-    addMessage,
-    { isLoading: isAddingMessage },
-  ] = useAddMessageMutation();
+  const [addMessage, { isLoading: isAddingMessage }] = useAddMessageMutation();
   const currentChannelId = useSelector(selectCurrentChannelId);
   const username = useSelector(selectUsername);
 
-  const sendMessage = async (values) => {
-  try {
-    await addMessage({
-      message: censorText(values.message),
-      channelId: currentChannelId,
-      username,
-    }).unwrap();
-    
-    // Критическая задержка только для тестов
-    if (process.env.NODE_ENV === 'test') {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Принудительный ререндер
-      window.dispatchEvent(new Event('resize'));
+  // Подписка на сообщения с автообновлением каждые 2 секунды (если WebSocket не используется)
+  useGetMessagesQuery(undefined, {
+    pollingInterval: 2000,
+  });
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const sendMessage = async (values, { resetForm, setSubmitting }) => {
+    try {
+      await addMessage({
+        message: censorText(values.message),
+        channelId: currentChannelId,
+        username,
+      }).unwrap();
+
+      // Искусственная задержка для тестов
+      if (process.env.NODE_ENV === 'test') {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        window.dispatchEvent(new Event('resize')); // Принудительный ререндер
+      }
+
+      resetForm();
+      inputRef.current.focus();
+    } catch (error) {
+      console.error('Send failed:', error);
+    } finally {
+      setSubmitting(false);
     }
-  } catch (error) {
-    console.error('Send failed:', error);
-  }
-};
-  
-  resetForm();
-  inputRef.current.focus();
-  setSubmitting(false);
-};
+  };
+
   return (
     <div className="mt-auto px-5 py-3">
       <Formik
@@ -57,18 +63,15 @@ const MessageForm = () => {
                 placeholder={t('messageForm.placeholder')}
                 autoFocus
                 required
-                innerRef={inputRef}
                 aria-label={t('messageForm.label')}
+                innerRef={inputRef}
               />
               <button
                 className="btn me-1"
                 type="submit"
-                disabled={isAddingMessage && isSubmitting}
+                disabled={isAddingMessage || isSubmitting}
               >
-                <SendFill
-                  color="royalblue"
-                  size={20}
-                />
+                <SendFill color="royalblue" size={20} />
                 <span className="visually-hidden">{t('messageForm.button')}</span>
               </button>
             </div>
