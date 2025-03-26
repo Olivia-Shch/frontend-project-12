@@ -8,23 +8,31 @@ const messagesApi = createApi({
     baseUrl: getAuthApiRoute('MESSAGES'),
     prepareHeaders: (headers) => prepareHeaders(headers),
   }),
-  tagTypes: ['Channels', 'Messages'],
+  tagTypes: ['Messages'],
   endpoints: (builder) => ({
     getMessages: builder.query({
       query: () => '',
       providesTags: ['Messages'],
+      pollInterval: 2000, // Автоматическое обновление каждые 2 сек
     }),
     addMessage: builder.mutation({
       query: (message) => ({
+        url: '',
         method: 'POST',
         body: message,
       }),
-      invalidatesTags: ['Messages'],
+      async onQueryStarted(message, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(messagesApi.util.invalidateTags(['Messages'])); // Принудительное обновление
+        } catch (error) {
+          console.error('Ошибка при отправке сообщения:', error);
+        }
+      },
     }),
   }),
 });
+
 export default messagesApi;
-export const {
-  useGetMessagesQuery,
-  useAddMessageMutation,
-} = messagesApi;
+export const { useGetMessagesQuery, useAddMessageMutation } = messagesApi;
+
