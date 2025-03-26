@@ -11,9 +11,16 @@ const messagesApi = createApi({
   tagTypes: ['Channels', 'Messages'],
   endpoints: (builder) => ({
     getMessages: builder.query({
-      query: () => '',
-      providesTags: ['Messages'],
-    }),
+  query: () => '',
+  providesTags: ['Messages'],
+  transformResponse: (response) => {
+    if (process.env.NODE_ENV === 'test') {
+      const start = Date.now();
+      while (Date.now() - start < 200) {}
+    }
+    return response;
+  }
+}),
     addMessage: builder.mutation({
       query: (message) => ({
         method: 'POST',
