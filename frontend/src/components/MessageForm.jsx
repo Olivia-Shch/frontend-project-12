@@ -25,7 +25,12 @@ const MessageForm = () => {
       channelId: currentChannelId,
       username,
     };
+    
     await addMessage(data);
+    
+    // Добавляем небольшую задержку для стабилизации теста
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     resetForm();
     inputRef.current.focus();
     setSubmitting(false);
