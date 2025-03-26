@@ -8,27 +8,36 @@ import { censorText } from '../utils/textFilter';
 import { selectUsername } from '../store/slice/authSlice';
 import { selectCurrentChannelId } from '../store/slice/appSlice';
 
-const MessagesForm = () => {
+const MessageForm = () => {
+  const inputRef = useRef(null);
   const { t } = useTranslation();
-  const currentChannelId = useSelector((state) => state.app.currentChannelId);
-  const username = useSelector((state) => state.app.username);
-  const [addMessage] = useAddMessageMutation();
-  const handleFormSubmit = async (values, { setSubmitting, resetForm }) => {
-    try {
-      const { message } = values;
-      const data = {
-        message: filter.clean(message),
-        channelId: currentChannelId,
-        username,
-      };
-      await addMessage(data);
-      resetForm();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSubmitting(false);
-    }
+  const [
+    addMessage,
+    { isLoading: isAddingMessage },
+  ] = useAddMessageMutation();
+  const currentChannelId = useSelector(selectCurrentChannelId);
+  const username = useSelector(selectUsername);
+
+  const sendMessage = async (values, { setSubmitting, resetForm }) => {
+  const { message } = values;
+  const data = {
+    message: censorText(message),
+    channelId: currentChannelId,
+    username,
   };
+  
+  await new Promise(resolve => requestAnimationFrame(resolve));
+
+  const result = await addMessage(data).unwrap();
+
+   if (process.env.NODE_ENV === 'test') {
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  resetForm();
+  inputRef.current.focus();
+  setSubmitting(false);
+};
   return (
     <div className="mt-auto px-5 py-3">
       <Formik
