@@ -3,13 +3,14 @@ import { Provider } from 'react-redux';
 import i18next from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
+import { io } from 'socket.io-client';
 import channelsApi from './api/channelsApi.js';
 import messagesApi from './api/messagesApi.js';
 import store from './store/store.js';
 import App from './App.jsx';
 import resources from './locales/index.js';
 import { addRussianDictionary } from './utils/textFilter.js';
-import { io } from 'socket.io-client';
+import { setDefaultChannel } from './store/slice/appSlice.js';
 
 const init = async (socket) => {
   const rollbarConfig = {
