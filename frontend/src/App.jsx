@@ -12,7 +12,9 @@ import ErrorNotification from './components/ErrorNotification.jsx';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => (
-  <BrowserRouter> {/* Добавлен BrowserRouter */}
+  <BrowserRouter>
+    {' '}
+    {/* Добавлен BrowserRouter */}
     <div className="d-flex flex-column h-100">
       <Navbar />
       <ErrorNotification />
@@ -24,7 +26,7 @@ const App = () => (
       </Routes>
       <ToastContainer />
     </div>
-  </BrowserRouter> 
+  </BrowserRouter>
 );
 
 export default App;
