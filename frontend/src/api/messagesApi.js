@@ -8,37 +8,36 @@ const messagesApi = createApi({
     baseUrl: getAuthApiRoute('MESSAGES'),
     prepareHeaders: (headers) => prepareHeaders(headers),
   }),
-  tagTypes: ['Message'], // Упрощаем теги (важно использовать 'Message' вместо 'Messages')
+  tagTypes: ['Message'],
   endpoints: (builder) => ({
     getMessages: builder.query({
-      query: () => '',
-      providesTags: (result) => 
-        result
-          ? [...result.map(({ id }) => ({ type: 'Message', id })), 'Message']
-          : ['Message'],
+      query: () => {
+        const timestamp = Date.now();
+        return `?timestamp=${timestamp}`;
+      },
+      providesTags: ['Message'],
+      // Жесткий polling для тестов
+      ...(process.env.NODE_ENV === 'test' && { pollingInterval: 500 }),
     }),
     addMessage: builder.mutation({
       query: (message) => ({
         method: 'POST',
         body: message,
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: 'Message', channelId: arg.channelId } // Точечная инвалидация
-      ],
+      invalidatesTags: ['Message'],
       async onQueryStarted(message, { dispatch, queryFulfilled }) {
-        // Оптимистичное обновление
-        const patchResult = dispatch(
-          messagesApi.util.updateQueryData('getMessages', '', (draft) => {
-            draft.push({
+        dispatch(
+          messagesApi.util.updateQueryData('getMessages', undefined, (draft) => {
+            draft?.push({
               ...message,
-              id: Date.now().toString(), // Временный ID
+              id: `temp-${Date.now()}`,
             });
           })
         );
         try {
           await queryFulfilled;
+          dispatch(messagesApi.util.invalidateTags(['Message']));
         } catch {
-          patchResult.undo(); // Откат при ошибке
         }
       },
     }),
@@ -46,7 +45,4 @@ const messagesApi = createApi({
 });
 
 export default messagesApi;
-export const { 
-  useGetMessagesQuery, 
-  useAddMessageMutation 
-} = messagesApi;
+export const { useGetMessagesQuery, useAddMessageMutation } = messagesApi;
