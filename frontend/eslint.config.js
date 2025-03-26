@@ -28,6 +28,16 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: [
+            '**/*.config.js',
+            '**/*.config.*.js',
+            '**/eslint.config.js',
+          ],
+        },
+      ],
     },
   },
 ];
