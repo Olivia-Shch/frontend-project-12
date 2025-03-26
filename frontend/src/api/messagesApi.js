@@ -32,12 +32,13 @@ const messagesApi = createApi({
               ...message,
               id: `temp-${Date.now()}`,
             });
-          })
+          }),
         );
         try {
           await queryFulfilled;
           dispatch(messagesApi.util.invalidateTags(['Message']));
         } catch {
+          
         }
       },
     }),
