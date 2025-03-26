@@ -37,8 +37,7 @@ const messagesApi = createApi({
         try {
           await queryFulfilled;
           dispatch(messagesApi.util.invalidateTags(['Message']));
-        } catch {
-          
+        } catch {          
         }
       },
     }),
