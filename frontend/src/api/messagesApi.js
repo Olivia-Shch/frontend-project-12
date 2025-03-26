@@ -11,25 +11,24 @@ const messagesApi = createApi({
   tagTypes: ['Channels', 'Messages'],
   endpoints: (builder) => ({
     getMessages: builder.query({
-  query: () => '',
-  providesTags: ['Messages'],
-  transformResponse: (response) => {
-    if (process.env.NODE_ENV === 'test') {
-      const start = Date.now();
-      while (Date.now() - start < 200) {}
-    }
-    return response;
-  }
-}),
+      query: () => '/messages',
+      providesTags: ['Messages'],
+      refetchOnMountOrArgChange: true, // Авто-обновление
+    }),
     addMessage: builder.mutation({
       query: (message) => ({
+        url: '/messages', // Явно указываем путь
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: message,
       }),
       invalidatesTags: ['Messages'],
     }),
   }),
 });
+
 export default messagesApi;
 export const {
   useGetMessagesQuery,
