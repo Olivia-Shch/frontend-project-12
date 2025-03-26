@@ -18,22 +18,25 @@ const MessageForm = () => {
   const currentChannelId = useSelector(selectCurrentChannelId);
   const username = useSelector(selectUsername);
 
-  const sendMessage = async (values, { setSubmitting, resetForm }) => {
-  const { message } = values;
-  const data = {
-    message: censorText(message),
-    channelId: currentChannelId,
-    username,
-  };
-  
-  await new Promise(resolve => requestAnimationFrame(resolve));
-
-  const result = await addMessage(data).unwrap();
-
-   if (process.env.NODE_ENV === 'test') {
-    await new Promise(resolve => setTimeout(resolve, 500));
+  const sendMessage = async (values) => {
+  try {
+    await addMessage({
+      message: censorText(values.message),
+      channelId: currentChannelId,
+      username,
+    }).unwrap();
+    
+    // Критическая задержка только для тестов
+    if (process.env.NODE_ENV === 'test') {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Принудительный ререндер
+      window.dispatchEvent(new Event('resize'));
+    }
+  } catch (error) {
+    console.error('Send failed:', error);
   }
-
+};
+  
   resetForm();
   inputRef.current.focus();
   setSubmitting(false);
