@@ -17,6 +17,7 @@
     "@rollbar/react": "^0.12.1",
     "@vitejs/plugin-react": "^4.3.4",
     "bootstrap": "^5.3.3",
+    "classnames": "^2.5.1",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "formik": "^2.4.6",
