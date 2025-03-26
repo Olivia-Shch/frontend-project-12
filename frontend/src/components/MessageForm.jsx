@@ -76,8 +76,15 @@ const MessageForm = () => {
   );
 };
 
-console.log('Sending message:', data);
-const response = await addMessage(data).unwrap();
-console.log('Message sent:', response);
+console.log("Sending message:", data);
+addMessage(data)
+  .unwrap()
+  .then((response) => {
+    console.log("Message sent:", response);
+  })
+  .catch((error) => {
+    console.error("Failed to send message:", error);
+  });
+
 
 export default MessageForm;
