@@ -76,4 +76,8 @@ const MessageForm = () => {
   );
 };
 
+console.log('Sending message:', data);
+const response = await addMessage(data).unwrap();
+console.log('Message sent:', response);
+
 export default MessageForm;
