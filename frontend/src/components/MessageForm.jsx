@@ -11,33 +11,28 @@ import { selectCurrentChannelId } from '../store/slice/appSlice';
 const MessageForm = () => {
   const inputRef = useRef(null);
   const { t } = useTranslation();
-  const [addMessage] = useAddMessageMutation();
+  const [
+    addMessage,
+    { isLoading: isAddingMessage },
+  ] = useAddMessageMutation();
   const currentChannelId = useSelector(selectCurrentChannelId);
   const username = useSelector(selectUsername);
 
   const sendMessage = async (values, { setSubmitting, resetForm }) => {
-    const { message } = values;
-    const data = {
-      message: censorText(message),
-      channelId: currentChannelId,
-      username,
-    };
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const response = await addMessage(data).unwrap();
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      resetForm();
-      inputRef.current.focus();
-    } catch (error) {
-      console.error('Failed to send message:', error);
-    } finally {
-      setSubmitting(false);
-    }
+  const { message } = values;
+  const data = {
+    message: censorText(message),
+    channelId: currentChannelId,
+    username,
   };
+
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  await addMessage(data);
+  resetForm();
+  inputRef.current.focus();
+  setSubmitting(false);
+};
 
   return (
     <div className="mt-auto px-5 py-3">
