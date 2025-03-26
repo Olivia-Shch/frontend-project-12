@@ -16,7 +16,6 @@ const messagesApi = createApi({
         return `?timestamp=${timestamp}`;
       },
       providesTags: ['Message'],
-      // Жесткий polling для тестов
       ...(process.env.NODE_ENV === 'test' && { pollingInterval: 500 }),
     }),
     addMessage: builder.mutation({
@@ -37,7 +36,8 @@ const messagesApi = createApi({
         try {
           await queryFulfilled;
           dispatch(messagesApi.util.invalidateTags(['Message']));
-        } catch {          
+        } catch {
+          // Empty catch block intentionally left for error suppression
         }
       },
     }),
