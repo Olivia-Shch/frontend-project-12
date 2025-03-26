@@ -15,7 +15,6 @@ const MessageForm = () => {
   const currentChannelId = useSelector(selectCurrentChannelId);
   const username = useSelector(selectUsername);
 
-  // Подписка на сообщения с автообновлением каждые 2 секунды (если WebSocket не используется)
   useGetMessagesQuery(undefined, {
     pollingInterval: 2000,
   });
@@ -32,10 +31,11 @@ const MessageForm = () => {
         username,
       }).unwrap();
 
-      // Искусственная задержка для тестов
       if (process.env.NODE_ENV === 'test') {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        window.dispatchEvent(new Event('resize')); // Принудительный ререндер
+        await new Promise((resolve) => {
+          setTimeout(resolve, 500);
+        });
+        window.dispatchEvent(new Event('resize'));
       }
 
       resetForm();
