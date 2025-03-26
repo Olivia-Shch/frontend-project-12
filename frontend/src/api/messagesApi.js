@@ -8,25 +8,37 @@ const messagesApi = createApi({
     baseUrl: getAuthApiRoute('MESSAGES'),
     prepareHeaders: (headers) => prepareHeaders(headers),
   }),
-  tagTypes: ['Messages'],
+  tagTypes: ['Message'], // Упрощаем теги (важно использовать 'Message' вместо 'Messages')
   endpoints: (builder) => ({
     getMessages: builder.query({
       query: () => '',
-      providesTags: ['Messages'],
-      pollInterval: 2000, // Автоматическое обновление каждые 2 сек
+      providesTags: (result) => 
+        result
+          ? [...result.map(({ id }) => ({ type: 'Message', id })), 'Message']
+          : ['Message'],
     }),
     addMessage: builder.mutation({
       query: (message) => ({
-        url: '',
         method: 'POST',
         body: message,
       }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'Message', channelId: arg.channelId } // Точечная инвалидация
+      ],
       async onQueryStarted(message, { dispatch, queryFulfilled }) {
+        // Оптимистичное обновление
+        const patchResult = dispatch(
+          messagesApi.util.updateQueryData('getMessages', '', (draft) => {
+            draft.push({
+              ...message,
+              id: Date.now().toString(), // Временный ID
+            });
+          })
+        );
         try {
           await queryFulfilled;
-          dispatch(messagesApi.util.invalidateTags(['Messages'])); // Принудительное обновление
-        } catch (error) {
-          console.error('Ошибка при отправке сообщения:', error);
+        } catch {
+          patchResult.undo(); // Откат при ошибке
         }
       },
     }),
@@ -34,5 +46,7 @@ const messagesApi = createApi({
 });
 
 export default messagesApi;
-export const { useGetMessagesQuery, useAddMessageMutation } = messagesApi;
-
+export const { 
+  useGetMessagesQuery, 
+  useAddMessageMutation 
+} = messagesApi;
