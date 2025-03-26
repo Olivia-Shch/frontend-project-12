@@ -7,7 +7,7 @@ import { useAddMessageMutation } from '../api/messagesApi';
 import { censorText } from '../utils/textFilter';
 import { selectUsername } from '../store/slice/authSlice';
 import { selectCurrentChannelId } from '../store/slice/appSlice';
-import { store } from '../store/store'; // Импортируем Redux store
+import store from '../store/store';
 
 const MessageForm = () => {
   const inputRef = useRef(null);
@@ -25,39 +25,38 @@ const MessageForm = () => {
     };
 
     try {
-      // 1. Гарантируем обновление DOM перед отправкой
+      // 1. Гарантируем завершение текущего цикла рендеринга
       await new Promise(resolve => requestAnimationFrame(resolve));
 
-      // 2. Отправляем сообщение с таймаутом
-      await Promise.race([
-        addMessage(data).unwrap(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
-      ]);
+      // 2. Отправляем сообщение
+      await addMessage(data).unwrap();
 
-      // 3. В тестовом режиме ждём обновления кэша RTK Query
+      // 3. В тестовом режиме ждём обновления кэша
       if (process.env.NODE_ENV === 'test') {
-        await new Promise(resolve => {
-          const checkCache = () => {
+        await new Promise((resolve) => {
+          const checkState = () => {
             const state = store.getState();
-            const messages = state.messagesApi?.queries['getMessages("")']?.data || [];
-            const lastMessage = messages[messages.length - 1];
-            if (lastMessage?.message === data.message) {
-              resolve();
+            const messages = state.messagesApi.queries['getMessages("")']?.data || [];
+            const found = messages.some(m => 
+              m.message === data.message && 
+              m.channelId === currentChannelId &&
+              m.username === username
+            );
+            if (found) {
+              // Дополнительная пауза для применения изменений в DOM
+              setTimeout(resolve, 300);
             } else {
-              setTimeout(checkCache, 100);
+              setTimeout(checkState, 100);
             }
           };
-          checkCache();
+          checkState();
         });
-
-        // Дополнительная пауза для рендера
-        await new Promise(resolve => setTimeout(resolve, 300));
       }
 
       resetForm();
       inputRef.current.focus();
     } catch (error) {
-      console.error('Ошибка отправки сообщения:', error);
+      console.error('Message send error:', error);
     } finally {
       setSubmitting(false);
     }
