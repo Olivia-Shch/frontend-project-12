@@ -17,7 +17,6 @@ const init = async (socket) => {
     environment: 'production',
   };
   
-
   const i18nextInstance = i18next.createInstance();
   await i18nextInstance.init({
     debug: false,
