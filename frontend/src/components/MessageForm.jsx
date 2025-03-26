@@ -11,10 +11,7 @@ import { selectCurrentChannelId } from '../store/slice/appSlice';
 const MessageForm = () => {
   const inputRef = useRef(null);
   const { t } = useTranslation();
-  const [
-    addMessage,
-    { isLoading: isAddingMessage },
-  ] = useAddMessageMutation();
+  const [addMessage] = useAddMessageMutation();
   const currentChannelId = useSelector(selectCurrentChannelId);
   const username = useSelector(selectUsername);
 
@@ -25,15 +22,21 @@ const MessageForm = () => {
       channelId: currentChannelId,
       username,
     };
-    
-    await addMessage(data);
-    
-    // Добавляем небольшую задержку для стабилизации теста
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    resetForm();
-    inputRef.current.focus();
-    setSubmitting(false);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const response = await addMessage(data).unwrap();
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      resetForm();
+      inputRef.current.focus();
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
