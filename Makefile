@@ -1,14 +1,16 @@
-build:
-	make -C frontend build
+.PHONY: install build start start-backend start-frontend
 
-start:
-	make start-backend
+install:
+	npm ci
+	cd frontend && npm ci
+
+build:
+	cd frontend && npm run build
+
+start: build start-backend
 
 start-frontend:
 	cd frontend && npm run dev
 
 start-backend:
-	npx start-server
-
-install:
-	npm ci && make -C frontend install
+	npx start-server --port 5001 --static ./frontend/dist
