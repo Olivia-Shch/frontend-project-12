@@ -8,23 +8,23 @@ const messagesApi = createApi({
     baseUrl: getAuthApiRoute('MESSAGES'),
     prepareHeaders: (headers) => prepareHeaders(headers),
   }),
-  tagTypes: ['Messages'],
+  tagTypes: ['Channels', 'Messages'],
   endpoints: (builder) => ({
     getMessages: builder.query({
-      query: () => '/messages', // Указываем корректный эндпоинт
+      query: () => '',
       providesTags: ['Messages'],
-      refetchOnMountOrArgChange: true, // Автообновление сообщений
     }),
     addMessage: builder.mutation({
       query: (message) => ({
-        url: '/messages',
         method: 'POST',
         body: message,
       }),
-      invalidatesTags: ['Messages'], // Гарантированное обновление списка сообщений
+      invalidatesTags: ['Messages'],
     }),
   }),
 });
-
 export default messagesApi;
-export const { useGetMessagesQuery, useAddMessageMutation } = messagesApi;
+export const {
+  useGetMessagesQuery,
+  useAddMessageMutation,
+} = messagesApi;
