@@ -4,8 +4,9 @@ const initialState = {
   currentChannelId: 1,
   currentChannelName: 'general',
   modalType: '',
-  channelId: '',
+  channelId: null,
   channelName: '',
+  isOpen: false,
 };
 
 const appSlice = createSlice({
@@ -16,34 +17,52 @@ const appSlice = createSlice({
       state.currentChannelId = payload.id;
       state.currentChannelName = payload.name;
     },
-    setChannelModal: (state, { payload }) => {
-      state.modalType = payload.modalName;
-      state.channelId = payload.id;
-      state.channelName = payload.name;
+    openModal: (state, { payload }) => {
+      state.modalType = payload.type;
+      state.channelId = payload.id || null;
+      state.channelName = payload.name || '';
+      state.isOpen = true;
+    },
+    closeModal: (state) => {
+      state.modalType = '';
+      state.channelId = null;
+      state.channelName = '';
+      state.isOpen = false;
     },
     setDefaultChannel: (state) => {
       state.currentChannelId = 1;
       state.currentChannelName = 'general';
     },
-    closeModal: (state) => {
-      state.modalType = '';
-      state.channelId = '';
-      state.channelName = '';
+    handleChannelRemoved: (state, { payload }) => {
+      if (state.currentChannelId === payload.id) {
+        state.currentChannelId = 1;
+        state.currentChannelName = 'general';
+      }
     },
-  },
+    handleChannelRenamed: (state, { payload }) => {
+      if (state.currentChannelId === payload.id) {
+        state.currentChannelName = payload.name;
+      }
+    }
+  }
 });
 
 export const {
   changeChannel,
-  setChannelModal,
-  setDefaultChannel,
+  openModal,
   closeModal,
+  setDefaultChannel,
+  handleChannelRemoved,
+  handleChannelRenamed,
 } = appSlice.actions;
 
 export const selectCurrentChannelId = (state) => state.app.currentChannelId;
 export const selectCurrentChannelName = (state) => state.app.currentChannelName;
-export const selectChannelName = (state) => state.app.channelName;
-export const selectChannelId = (state) => state.app.channelId;
-export const selectModalType = (state) => state.app.modalType;
+export const selectModalState = (state) => ({
+  type: state.app.modalType,
+  id: state.app.channelId,
+  name: state.app.channelName,
+  isOpen: state.app.isOpen
+});
 
 export default appSlice.reducer;
