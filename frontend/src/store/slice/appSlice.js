@@ -15,37 +15,52 @@ const appSlice = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    changeChannel: (state, { payload }) => {
-      state.currentChannelId = payload.id;
-      state.currentChannelName = payload.name;
-    },
-    setChannelModal: (state, { payload }) => {
-      state.modalType = payload.modalName;
-      state.channelId = payload.id;
-      state.channelName = payload.name || '';
-      state.isOpen = true;
-    },
-    closeModal: (state) => {
-      state.modalType = '';
-      state.channelId = null;
-      state.channelName = '';
-      state.isOpen = false;
-      state.isError = false;
-      state.error = null;
-    },
-    setDefaultChannel: (state) => {
-      state.currentChannelId = 1;
-      state.currentChannelName = 'general';
-    },
-    setError: (state, { payload }) => {
-      state.isError = true;
-      state.error = payload;
-    },
-    clearError: (state) => {
-      state.isError = false;
-      state.error = null;
-    }
-  }
+    changeChannel: (state, { payload }) => ({
+      ...state,
+      currentChannelId: payload.id,
+      currentChannelName: payload.name,
+    }),
+    setChannelModal: (state, { payload }) => ({
+      ...state,
+      modalType: payload.modalName,
+      channelId: payload.id,
+      channelName: payload.name || '',
+      isOpen: true,
+    }),
+    closeModal: () => ({
+      ...initialState,
+      currentChannelId: initialState.currentChannelId,
+      currentChannelName: initialState.currentChannelName,
+    }),
+    setDefaultChannel: () => ({
+      ...initialState,
+    }),
+    setError: (state, { payload }) => ({
+      ...state,
+      isError: true,
+      error: payload,
+    }),
+    clearError: (state) => ({
+      ...state,
+      isError: false,
+      error: null,
+    }),
+    handleChannelRemoved: (state, { payload }) => ({
+      ...state,
+      currentChannelId: state.currentChannelId === payload.id 
+        ? 1 
+        : state.currentChannelId,
+      currentChannelName: state.currentChannelId === payload.id 
+        ? 'general' 
+        : state.currentChannelName,
+    }),
+    handleChannelRenamed: (state, { payload }) => ({
+      ...state,
+      currentChannelName: state.currentChannelId === payload.id
+        ? payload.name
+        : state.currentChannelName,
+    }),
+  },
 });
 
 export const {
@@ -54,7 +69,9 @@ export const {
   closeModal,
   setDefaultChannel,
   setError,
-  clearError
+  clearError,
+  handleChannelRemoved,
+  handleChannelRenamed,
 } = appSlice.actions;
 
 export const selectCurrentChannelId = (state) => state.app.currentChannelId;
