@@ -17,8 +17,8 @@ const appSlice = createSlice({
       state.currentChannelId = payload.id;
       state.currentChannelName = payload.name;
     },
-    openModal: (state, { payload }) => {
-      state.modalType = payload.type;
+    setChannelModal: (state, { payload }) => {
+      state.modalType = payload.modalName;
       state.channelId = payload.id || null;
       state.channelName = payload.name || '';
       state.isOpen = true;
@@ -49,7 +49,7 @@ const appSlice = createSlice({
 
 export const {
   changeChannel,
-  openModal,
+  setChannelModal,
   closeModal,
   setDefaultChannel,
   handleChannelRemoved,
