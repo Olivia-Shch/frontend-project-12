@@ -9,28 +9,18 @@ import MessageForm from './MessageForm';
 const ChatContainer = () => {
   const { data: messages = [], isLoading } = useGetMessagesQuery();
   const currentChannelId = useSelector(selectCurrentChannelId);
-  
-  const filteredMessages = messages.filter(
-    (message) => message.channelId === currentChannelId
-  );
+  const filteredMessages = messages.filter((message) => message.channelId === currentChannelId);
 
-  if (isLoading) {
-    return (
-      <div className="col p-0 h-100">
-        <div className="d-flex flex-column h-100 justify-content-center align-items-center">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const messagesToRender = isLoading ? [] : filteredMessages;
 
   return (
     <div className="col p-0 h-100">
       <div className="d-flex flex-column h-100">
         <ChatHeader filteredMessages={filteredMessages} />
-        <Messages messages={filteredMessages} />
+        <Messages
+          filteredMessages={messagesToRender}
+          isLoading={isLoading}
+        />
         <MessageForm />
       </div>
     </div>
