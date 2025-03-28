@@ -5,7 +5,6 @@ import { selectCurrentChannelId } from '../store/slice/appSlice';
 import ChatHeader from './ChatHeader';
 import Messages from './Messages';
 import MessageForm from './MessageForm';
-import Loader from './Loader';
 
 const ChatContainer = () => {
   const { data: messages = [], isLoading } = useGetMessagesQuery();
@@ -19,7 +18,9 @@ const ChatContainer = () => {
     return (
       <div className="col p-0 h-100">
         <div className="d-flex flex-column h-100 justify-content-center align-items-center">
-          <Loader />
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         </div>
       </div>
     );
