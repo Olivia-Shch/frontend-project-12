@@ -47,11 +47,11 @@ const appSlice = createSlice({
     }),
     handleChannelRemoved: (state, { payload }) => ({
       ...state,
-      currentChannelId: state.currentChannelId === payload.id 
-        ? 1 
+      currentChannelId: state.currentChannelId === payload.id
+        ? 1
         : state.currentChannelId,
-      currentChannelName: state.currentChannelId === payload.id 
-        ? 'general' 
+      currentChannelName: state.currentChannelId === payload.id
+        ? 'general'
         : state.currentChannelName,
     }),
     handleChannelRenamed: (state, { payload }) => ({
