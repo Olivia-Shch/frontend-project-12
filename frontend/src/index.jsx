@@ -1,13 +1,25 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
-import App from './main.jsx'; // Импортируем инициализированное приложение
+import React, { useState } from 'react';
+import { io } from 'socket.io-client';
+import init from './init.jsx';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const socket = io('/socket.io', {
+  path: '/socket.io',
+  transports: ['websocket'],
+});
 
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+const App = () => {
+  const [app, setApp] = useState(null);
+
+  init(socket)
+    .then(setApp)
+    .catch((err) => {
+      console.error('Ошибка при инициализации:', err);
+    });
+
+  return app || <div>Loading...</div>;
+};
+
+export default App;
+
