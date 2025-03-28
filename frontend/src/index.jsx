@@ -1,19 +1,13 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-toastify/dist/ReactToastify.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { io } from 'socket.io-client';
-import init from './init.js';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
+import App from './main.jsx'; // Импортируем инициализированное приложение
 
-const run = async () => {
-  const root = ReactDOM.createRoot(document.getElementById('chat'));
-  const socket = io();
-  const app = await init(socket);
-  root.render(
-    <React.StrictMode>
-      {app}
-    </React.StrictMode>,
-  );
-};
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
-run();
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
