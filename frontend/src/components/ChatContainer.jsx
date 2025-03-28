@@ -9,8 +9,8 @@ import MessageForm from './MessageForm';
 const ChatContainer = () => {
   const { data: messages = [], isLoading } = useGetMessagesQuery();
   const currentChannelId = useSelector(selectCurrentChannelId);
-  
-  const filtredMessages = isLoading 
+
+  const filtredMessages = isLoading
     ? []
     : messages.filter((message) => message.channelId === currentChannelId);
 
