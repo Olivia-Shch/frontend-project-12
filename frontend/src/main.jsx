@@ -1,22 +1,11 @@
-import React, { useState } from 'react';
-import { io } from 'socket.io-client';
-import init from './init.jsx';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './index.jsx'; // Импортируем приложение
 
-const socket = io('/socket.io', {
-  path: '/socket.io',
-  transports: ['websocket'],
-});
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
-const App = () => {
-  const [app, setApp] = useState(null);
-
-  init(socket)
-    .then(setApp)
-    .catch((err) => {
-      console.error('Ошибка при инициализации:', err);
-    });
-
-  return app || <div>Loading...</div>;
-};
-
-export default App;
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
